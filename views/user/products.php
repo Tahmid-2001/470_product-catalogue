@@ -1,53 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Search Products</title>
+    <title>Product Search</title>
     <link rel="stylesheet" href="../public/styles.css">
+    <style>
+        .card { 
+            display: none; 
+            width: 200px; 
+            background: #fff; 
+            border: 1px solid #ddd; 
+            padding: 1rem; 
+            margin: 1rem; 
+            text-align: center; 
+        }
+        .card h3 { margin-bottom: 0.5rem; }
+        .card p { margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .card .price { font-weight: bold; color: #007bff; }
+    </style>
 </head>
 <body>
 <header>
-    <h1>Product Catalogue System – User Dashboard</h1>
+    <h1>Product Search & Filter</h1>
     <div>
-        <a href="index.php?action=user_dashboard">Back</a>
+        <a href="index.php?action=user_dashboard">Back to Dashboard</a>
         <a href="index.php?action=logout">Logout</a>
     </div>
 </header>
 
-<input id="search" type="text" placeholder="Type to search products...">
+<input type="text" id="search" placeholder="Search products...">
+<div id="no-results" style="display: none;">No products found matching your search.</div>
 
-<div class="grid" id="productGrid">
-    <?php foreach ($products as $p): ?>
-        <div class="card" data-id="<?= $p['product_id'] ?>">
-            <img src="../assets/<?= htmlspecialchars($p['product_image']) ?>" alt="">
-            <p class="name"><?= htmlspecialchars($p['product_name']) ?></p>
-        </div>
+<div class="grid">
+    <?php foreach ($products as $product): ?>
+    <div class="card" data-name="<?= strtolower($product['product_name']) ?>">
+        <h3><?= htmlspecialchars($product['product_name']) ?></h3>
+        <p><?= htmlspecialchars($product['product_type']) ?></p>
+        <p class="price">$<?= number_format($product['product_price'], 2) ?></p>
+        <a href="index.php?action=product_detail&id=<?= $product['product_id'] ?>" class="btn">View Details</a>
+    </div>
     <?php endforeach; ?>
 </div>
 
 <script>
-    const search = document.getElementById('search');
+document.getElementById('search').addEventListener('keyup', function() {
+    const query = this.value.toLowerCase();
     const cards = document.querySelectorAll('.card');
+    const noResults = document.getElementById('no-results');
+    let hasResults = false;
 
-    function filterCards() {
-        const term = search.value.toLowerCase().trim();
-        if (!term) {
-            cards.forEach(c => c.style.display = 'none');
-            return;
+    cards.forEach(card => {
+        const name = card.getAttribute('data-name');
+        if (name.includes(query)) {
+            card.style.display = 'block';
+            hasResults = true;
+        } else {
+            card.style.display = 'none';
         }
-        cards.forEach(c => {
-            const name = c.querySelector('.name').textContent.toLowerCase();
-            c.style.display = name.includes(term) ? 'block' : 'none';
-        });
-    }
-
-    search.addEventListener('input', filterCards);
-
-    cards.forEach(c => {
-        c.addEventListener('click', () => {
-            const id = c.getAttribute('data-id');
-            window.location.href = `index.php?action=product_detail&id=${id}`;
-        });
     });
+
+    noResults.style.display = hasResults ? 'none' : 'block';
+});
 </script>
 </body>
 </html>

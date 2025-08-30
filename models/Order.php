@@ -68,6 +68,23 @@ class Order {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Admin methods for order management
+    public function getAllOrders() {
+        $stmt = $this->pdo->prepare("
+            SELECT o.order_id, u.full_name, o.product_name, o.quantity, o.total_price, o.order_status, o.order_date
+            FROM orders o
+            JOIN users u ON o.user_id = u.user_id
+            ORDER BY o.order_date DESC
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function updateOrderStatus($orderId, $status) {
+        $stmt = $this->pdo->prepare("UPDATE orders SET order_status = ? WHERE order_id = ?");
+        $stmt->execute([$status, $orderId]);
+    }
+
     // Helper: get product name
     private function getProductName($productId) {
         $stmt = $this->pdo->prepare("SELECT product_name FROM products WHERE product_id = ?");
@@ -75,3 +92,4 @@ class Order {
         return $stmt->fetchColumn();
     }
 }
+?>

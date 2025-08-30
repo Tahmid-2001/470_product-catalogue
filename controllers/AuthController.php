@@ -6,7 +6,7 @@ class AuthController {
 
     public function __construct() {
         $this->userModel = new User();
-        session_start();
+        // Remove session_start() from here - it's already called in index.php
     }
 
     public function showLogin() {
@@ -47,3 +47,4 @@ class AuthController {
         header('Location: index.php?action=login');
     }
 }
+?>
